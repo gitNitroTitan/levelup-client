@@ -1,9 +1,22 @@
+import axios from 'axios';
 import { clientCredentials } from '../client';
 
-const getEvents = () => new Promise((resolve, reject) => {
-  fetch(`${clientCredentials.databaseURL}/events`)
-    .then((response) => response.json())
-    .then(resolve)
+const getEvents = (user = '') => new Promise((resolve, reject) => {
+  axios
+    .get(`${clientCredentials.databaseURL}/events?uid=${user}`)
+    .then((response) => resolve(Object.values(response.data)))
+    .catch(reject);
+});
+
+const getSingleEvent = (id) => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/events/${id}`)
+    .then((response) => resolve(response.json()))
+    .catch((error) => reject(error));
+});
+
+const getEventById = (id) => new Promise((resolve, reject) => {
+  axios.get(`${clientCredentials.databaseURL}/events/${id}`)
+    .then((response) => resolve(response.data))
     .catch(reject);
 });
 
@@ -20,20 +33,25 @@ const createEvent = (event) => new Promise((resolve, reject) => {
 });
 
 const updateEvent = (event) => new Promise((resolve, reject) => {
-  fetch(`${clientCredentials.databaseURL}/events/${event.id}`)
+  axios.put(`${clientCredentials.databaseURL}/events/${event.id}`, event)
     .then(resolve)
     .catch(reject);
 });
 
-const deleteEvent = (eventId) => new Promise((resolve, reject) => {
-  fetch(`${clientCredentials.databaseURL}/events/${eventId}`, {
-    method: 'DELETE',
-  })
+const deleteEvent = (id) => new Promise((resolve, reject) => {
+  axios.delete(`${clientCredentials.databaseURL}/events/${id}`)
     .then(resolve)
     .catch(reject);
 });
 
-// eslint-disable-next-line import/prefer-default-export
+const leaveEvent = (eventId, user) => new Promise((resolve, reject) => {
+  axios.delete(`${clientCredentials.databaseURL}/events/${eventId}/leave`, { data: user }).then(resolve).catch(reject);
+});
+
+const joinEvent = (eventId, user) => new Promise((resolve, reject) => {
+  axios.post(`${clientCredentials.databaseURL}/events/${eventId}/signup`, user).then(resolve).catch(reject);
+});
+
 export {
-  getEvents, createEvent, deleteEvent, updateEvent,
+  getEvents, getEventById, getSingleEvent, createEvent, updateEvent, deleteEvent, leaveEvent, joinEvent,
 };

@@ -89,11 +89,7 @@ const EventForm = ({ user }) => {
           }
           </Form.Select>
         </Form.Group>
-        {/* TODO: create the rest of the input fields */}
-
-        <Button variant="primary" type="submit">
-          Submit
-        </Button>
+        <Button variant="primary" type="submit">Submit</Button>
       </Form>
     </>
   );

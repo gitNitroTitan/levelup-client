@@ -1,6 +1,5 @@
 import { Button } from 'react-bootstrap';
 import { useRouter } from 'next/router';
-import { signOut } from '../utils/auth';
 import { useAuth } from '../utils/context/authContext';
 
 function Home() {
@@ -36,9 +35,9 @@ function Home() {
         Register New Event
       </Button>
       <br />
-      <Button variant="danger" type="button" size="lg" className="copy-btn" onClick={signOut}>
+      {/* <Button variant="danger" type="button" size="lg" className="copy-btn" onClick={signOut}>
         Sign Out
-      </Button>
+      </Button> */}
     </div>
   );
 }
