@@ -1,40 +1,46 @@
-import React from 'react';
 import PropTypes from 'prop-types';
+import React from 'react';
 import { Card, Button } from 'react-bootstrap';
+import Link from 'next/link';
 import { deleteGame } from '../../utils/data/gameData';
 
-const GameCard = ({ gameObj }) => {
-  console.warn(gameObj);
-  const deleteThisGame = () => {
-    if (window.confirm(`Delete ${gameObj.title}?`)) {
-      deleteGame(gameObj.id).then(() => {
-        window.location.reload();
-      });
+function GameCard({
+  id,
+  title,
+  maker,
+  numberOfPlayers,
+  skillLevel,
+  onUpdate,
+}) {
+  const deleteSingleGame = () => {
+    console.warn(id);
+    if (window.confirm(`Delete ${title}?`)) {
+      deleteGame(id).then(() => onUpdate());
     }
   };
   return (
     <Card className="text-center">
-      <Card.Header>{gameObj.title}</Card.Header>
+      <Card.Header>{title}</Card.Header>
       <Card.Body>
-        <Card.Title>By: {gameObj.maker}</Card.Title>
-        <Card.Text>{gameObj.numberOfPlayers} players needed</Card.Text>
-        <Button variant="danger" onClick={deleteThisGame} className="m-2">
-          DELETE
-        </Button>
+        <Card.Title>By: {maker}</Card.Title>
+        <Card.Text># of players: {numberOfPlayers}</Card.Text>
       </Card.Body>
-      <Card.Footer className="text-muted">Skill Level: {gameObj.skillLevel}</Card.Footer>
+      <Card.Footer className="text-muted">Skill Level: {skillLevel}</Card.Footer>
+      <Link href={`/games/edit/${id}`} passHref>
+        <Button variant="primary" className="m-2">Edit Game</Button>
+      </Link>
+      <Button variant="primary" className="m-2" onClick={deleteSingleGame}>Delete Game</Button>
     </Card>
   );
-};
+}
 
 GameCard.propTypes = {
-  gameObj: PropTypes.shape({
-    id: PropTypes.number,
-    title: PropTypes.string,
-    maker: PropTypes.string,
-    numberOfPlayers: PropTypes.number,
-    skillLevel: PropTypes.number,
-  }).isRequired,
-};
+  id: PropTypes.number,
+  title: PropTypes.string,
+  maker: PropTypes.string,
+  numberOfPlayers: PropTypes.number,
+  skillLevel: PropTypes.number,
+  onUpdate: PropTypes.func,
+}.isRequired;
 
 export default GameCard;

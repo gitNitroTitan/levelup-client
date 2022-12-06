@@ -5,33 +5,28 @@ import { Button, Form } from 'react-bootstrap';
 import { createEvent, updateEvent } from '../../utils/data/eventData';
 import { getGames } from '../../utils/data/gameData';
 
-const initialState = {
-  description: '',
-  date: '',
-  time: '',
-  gameId: 0,
-};
-
-const EventForm = ({ obj, user }) => {
+export default function EventForm({ user, obj }) {
+  const initialState = {
+    game: 0,
+    description: '',
+    date: '',
+    time: '',
+    organizer: user.uid,
+  };
   const [games, setGames] = useState([]);
-  /*
-  Since the input fields are bound to the values of
-  the properties of this state variable, you need to
-  provide some default values.
-  */
   const [currentEvent, setCurrentEvent] = useState(initialState);
   const router = useRouter();
 
-  const getGamesForm = () => {
-    if (obj.id) {
-      setCurrentEvent(obj);
-    }
-    getGames().then(setGames);
-  };
-
   useEffect(() => {
-    getGamesForm();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    getGames().then(setGames);
+    if (obj) {
+      setCurrentEvent({
+        game: obj.game,
+        description: obj.description,
+        date: obj.date,
+        time: obj.time,
+      });
+    }
   }, [obj]);
 
   const handleChange = (e) => {
@@ -47,66 +42,81 @@ const EventForm = ({ obj, user }) => {
     e.preventDefault();
 
     const event = {
+      game: currentEvent.game,
       description: currentEvent.description,
       date: currentEvent.date,
       time: currentEvent.time,
-      game: Number(currentEvent.game),
-      organizer_id: user.uid,
+      organizer: user.uid,
     };
     if (obj.id) {
-      const gameId = { ...currentEvent, game_id: currentEvent.game };
-      updateEvent(gameId).then(() => router.push(`/events/${gameId.id}`));
+      updateEvent(event, obj.id).then(() => router.push('/events'));
     } else {
-      createEvent(event).then(() => router.push(`/events/${event.id}`));
+      createEvent(event).then(() => router.push('/events'));
     }
   };
 
   return (
-    <Form onSubmit={handleSubmit}>
-      <Form.Group className="mb-3">
-        <Form.Label>Event description</Form.Label>
-        <Form.Control name="description" required value={currentEvent.description} onChange={handleChange} />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Date of Event</Form.Label>
-        <Form.Control name="date" type="date" required value={currentEvent.date} onChange={handleChange} />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Label>Time of Event</Form.Label>
-        <Form.Control name="time" type="time" required value={currentEvent.time} onChange={handleChange} />
-      </Form.Group>
-      <Form.Group className="mb-3">
-        <Form.Select name="game" onChange={handleChange}>
-          <option value="">Select a Game</option>
-          {games?.map((game) => (
-            <option key={game.id} value={game.id} selected={currentEvent.game === game.id}>
-              {game.title}
-            </option>
-          ))}
-        </Form.Select>
-      </Form.Group>
-      <Button variant="primary" type="submit">
-        Submit
-      </Button>
-    </Form>
+    <>
+      <Form onSubmit={handleSubmit}>
+        <Form.Group className="mb-3">
+          <Form.Label>Description</Form.Label>
+          <Form.Control name="description" required value={currentEvent.description} onChange={handleChange} />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Date</Form.Label>
+          <Form.Control type="date" name="date" required value={currentEvent.date} onChange={handleChange} />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Time</Form.Label>
+          <Form.Control type="time" name="time" required value={currentEvent.time} onChange={handleChange} />
+        </Form.Group>
+        <Form.Group className="mb-3">
+          <Form.Label>Game</Form.Label>
+          <Form.Select onChange={handleChange} className="mb-3" name="game" value={currentEvent.game?.id} required>
+            <option value="">Select a Game</option>
+            {games.map((game) => (
+              <option defaultValue={game.id === currentEvent.game} key={game.title} value={game.id}>
+                {game.title}
+              </option>
+            ))}
+          </Form.Select>
+        </Form.Group>
+
+        <Button variant="primary" type="submit">
+          Submit
+        </Button>
+      </Form>
+    </>
   );
-};
+}
 
 EventForm.propTypes = {
-  obj: PropTypes.shape({
-    id: PropTypes.number,
-    description: PropTypes.string,
-    date: PropTypes.string,
-    time: PropTypes.string,
-    game: PropTypes.number,
-  }),
   user: PropTypes.shape({
     uid: PropTypes.string.isRequired,
   }).isRequired,
+  obj: PropTypes.shape({
+    id: PropTypes.number,
+    game: PropTypes.shape({
+      id: PropTypes.number,
+      title: PropTypes.string,
+      maker: PropTypes.string,
+      number_of_players: PropTypes.number,
+      skill_level: PropTypes.number,
+      game_type: PropTypes.number,
+      gamer: PropTypes.number,
+    }),
+    description: PropTypes.string,
+    date: PropTypes.string,
+    time: PropTypes.string,
+  }),
 };
 
 EventForm.defaultProps = {
-  obj: initialState,
+  obj: PropTypes.shape({
+    id: '',
+    game: '',
+    description: '',
+    date: '',
+    time: '',
+  }),
 };
-
-export default EventForm;

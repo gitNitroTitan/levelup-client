@@ -7,40 +7,65 @@ const getGames = () => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
-const getSingleGame = (gameId) => new Promise((resolve, reject) => {
-  fetch(`${clientCredentials.databaseURL}/games/${gameId}`)
+const getSingleGame = (id) => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/games/${id}`)
     .then((response) => resolve(response.json()))
     .catch((error) => reject(error));
 });
 
-const createGame = (game) => new Promise((resolve, reject) => {
+const createGame = (user, game) => new Promise((resolve, reject) => {
+  const gameObj = {
+    maker: game.maker,
+    title: game.title,
+    number_of_players: Number(game.number_of_players),
+    skill_level: Number(game.skill_level),
+    game_type: Number(game.gameTypeId),
+    user_id: user.uid,
+  };
   fetch(`${clientCredentials.databaseURL}/games`, {
     method: 'POST',
     headers: {
-      'Content-Type': 'application/json',
+      'content-type': 'application/json',
     },
-    body: JSON.stringify(game),
+    body: JSON.stringify(gameObj),
   })
-    .then(resolve)
-    .catch(reject);
-});
-
-const getGameTypes = () => new Promise((resolve, reject) => {
-  fetch(`${clientCredentials.databaseURL}/gametypes`)
     .then((response) => response.json())
     .then(resolve)
     .catch(reject);
 });
 
-const deleteGame = (gameId) => new Promise((resolve, reject) => {
-  fetch(`${clientCredentials.databaseURL}/games/${gameId}`, {
-    method: 'DELETE',
+const updateGame = (user, game, id) => new Promise((resolve, reject) => {
+  const gameObj = {
+    maker: game.maker,
+    title: game.title,
+    number_of_players: Number(game.number_of_players),
+    skill_level: Number(game.skill_level),
+    game_type: Number(game.gameTypeId),
+    uid: user.uid,
+  };
+  fetch(`${clientCredentials.databaseURL}/games/${id}`, {
+    method: 'PUT',
+    headers: {
+      'content-type': 'application/json',
+    },
+    body: JSON.stringify(gameObj),
   })
-    .then(resolve)
+    .then((response) => resolve(response))
     .catch(reject);
 });
 
-// eslint-disable-next-line import/prefer-default-export
+const getGameTypes = () => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/gametypes`)
+    .then((response) => resolve(response.json()))
+    .catch((error) => reject(error));
+});
+
+const deleteGame = (id) => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/games/${id}`, {
+    method: 'DELETE',
+  }).then(resolve).catch(reject);
+});
+
 export {
-  getGames, createGame, getGameTypes, deleteGame, getSingleGame,
+  getGames, createGame, getGameTypes, updateGame, getSingleGame, deleteGame,
 };
