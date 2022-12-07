@@ -1,19 +1,23 @@
-import React from 'react';
 import PropTypes from 'prop-types';
-import { Card, Button } from 'react-bootstrap';
+import React from 'react';
 import Link from 'next/link';
-// import { useAuth } from '../../utils/context/authContext';
+import { Button, Card } from 'react-bootstrap';
 import { deleteEvent } from '../../utils/data/eventData';
 
-const EventCard = ({ eventObj }) => {
-  // const { user } = useAuth();
-  const deleteThisEvent = () => {
+function EventCard({ eventObj, onUpdate }) {
+  const deleteSingleEvent = () => {
     if (window.confirm(`Delete ${eventObj.description}?`)) {
-      deleteEvent(eventObj.id).then(() => {
-        window.location.reload();
-      });
+      deleteEvent(eventObj.id).then(() => onUpdate());
     }
   };
+
+  // const leaveTheEvent = () => {
+  //   leaveEvent(id, { user_id: user.uid }).then(() => onUpdate());
+  // };
+
+  // const joinTheEvent = () => {
+  //   joinEvent(id, { user_id: user.uid }).then(() => onUpdate());
+  // };
 
   return (
     <Card className="text-center">
@@ -21,39 +25,54 @@ const EventCard = ({ eventObj }) => {
       <Card.Body>
         <Card.Title>On: {eventObj.date}</Card.Title>
         <Card.Text>@: {eventObj.time}</Card.Text>
+        {/* {joined ? (
+          <Button
+            variant="warning"
+            onClick={leaveTheEvent}
+          >
+            Leave
+          </Button>
+        ) : (
+          <Button
+            onClick={joinTheEvent}
+          >
+            SIGN UP
+          </Button>
+        )} */}
         <Link href={`/events/edit/${eventObj.id}`} passHref>
           <Button variant="info">
             EDIT
           </Button>
         </Link>
-        <Button variant="danger" onClick={deleteThisEvent} className="m-2">
+        <Button variant="danger" onClick={deleteSingleEvent} className="m-2">
           DELETE
         </Button>
       </Card.Body>
       <Card.Footer className="text-muted">Django sucks</Card.Footer>
     </Card>
   );
-};
-
+}
 EventCard.propTypes = {
   eventObj: PropTypes.shape({
+    id: PropTypes.number,
     game: PropTypes.shape({
       id: PropTypes.number,
       title: PropTypes.string,
       maker: PropTypes.string,
-      number_of_players: PropTypes.number,
+      gamer: PropTypes.number,
+      number_of_player: PropTypes.number,
       skill_level: PropTypes.number,
     }).isRequired,
+    description: PropTypes.string,
+    date: PropTypes.string,
+    time: PropTypes.string,
     organizer: PropTypes.shape({
       id: PropTypes.number,
       uid: PropTypes.string,
       bio: PropTypes.string,
-    }).isRequired,
-    id: PropTypes.number,
-    description: PropTypes.string.isRequired,
-    date: PropTypes.string.isRequired,
-    time: PropTypes.string.isRequired,
+    }),
   }).isRequired,
+  onUpdate: PropTypes.func.isRequired,
 };
 
 export default EventCard;

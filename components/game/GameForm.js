@@ -39,7 +39,7 @@ const GameForm = ({ user, gameObj }) => {
     e.preventDefault();
 
     if (gameObj) {
-      updateGame(user, currentGame, gameObj.id).then(() => router.push('/games'));
+      updateGame(currentGame, gameObj.id).then(() => router.push('/games'));
     } else {
       createGame(user, currentGame).then(() => router.push('/games'));
     }

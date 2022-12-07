@@ -1,12 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { getSingleEvent } from '../../../utils/data/eventData';
+import { useAuth } from '../../../utils/context/authContext';
+import { getSingleEvent, getEvents } from '../../../utils/data/eventData';
 import EventForm from '../../../components/event/EventForm';
 
 export default function EditEvent() {
-  const [editEvent, setEditEvent] = useState([]);
+  const [editEvent, setEditEvent] = useState({});
+  const { user } = useAuth();
   const router = useRouter();
-  // TODO: grab the id
   const { id } = router.query;
 
   // TODO: make a call to the API to get the game data
@@ -15,5 +16,5 @@ export default function EditEvent() {
   }, [id]);
 
   // TODO: pass object to form
-  return (<EventForm obj={editEvent} />);
+  return (<EventForm user={user} obj={editEvent} onUpdate={getEvents} />);
 }
