@@ -2,34 +2,35 @@ import { useRouter } from 'next/router';
 import PropTypes from 'prop-types';
 import { useState, useEffect } from 'react';
 import { Button, Form } from 'react-bootstrap';
-import { createEvent } from '../../utils/data/eventData';
+import { createEvent, updateEvent } from '../../utils/data/eventData';
 import { getGames } from '../../utils/data/gameData';
 
-const initialState = {
-  description: '',
-  date: '',
-  time: '',
-  game: 0,
-};
-
-const EventForm = ({ user }) => {
+const EventForm = ({ user, obj }) => {
   const [games, setGames] = useState([]);
+  const initialState = {
+    description: '',
+    date: '',
+    time: '',
+    game: 0,
+  };
   const [currentEvent, setCurrentEvent] = useState(initialState);
-  /*
-  Since the input fields are bound to the values of
-  the properties of this state variable, you need to
-  provide some default values.
-  */
-
   const router = useRouter();
 
   useEffect(() => {
-    // TODO: Get the games, then set the state
+    // TODO: Get the game types, then set the state
     getGames().then(setGames);
-  }, []);
+    if (obj) {
+      // const editEvent = {
+      //   game: obj.id,
+      //   time: obj.time,
+      //   date: obj.date,
+      //   description: obj.description,
+      // };
+      setCurrentEvent(obj);
+    }
+  }, [obj, user]);
 
   const handleChange = (e) => {
-    // TODO: Complete the onChange function
     const { name, value } = e.target;
     setCurrentEvent((prevState) => ({
       ...prevState,
@@ -38,19 +39,19 @@ const EventForm = ({ user }) => {
   };
 
   const handleSubmit = (e) => {
-    // Prevent form from being submitted
     e.preventDefault();
-
     const event = {
+      game: Number(currentEvent.game),
       description: currentEvent.description,
       date: currentEvent.date,
       time: currentEvent.time,
-      game: Number(currentEvent.game),
-      organizer_id: user.id,
+      organizer: user.uid,
     };
-
-    // Send POST request to your API
-    createEvent(event).then(() => router.push('/events'));
+    if (obj) {
+      updateEvent(currentEvent, obj.id).then(() => router.push('/events'));
+    } else {
+      createEvent(event).then(() => router.push('/events'));
+    }
   };
 
   return (
@@ -68,13 +69,12 @@ const EventForm = ({ user }) => {
           <Form.Label>Time</Form.Label>
           <Form.Control name="time" required value={currentEvent.time} onChange={handleChange} />
         </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label>Organizer</Form.Label>
+        {/* <Form.Group className="mb-3"> */}
+        {/* <Form.Label>Organizer</Form.Label>
           <Form.Control name="organizer" required value={currentEvent.organizer} onChange={handleChange} />
-        </Form.Group>
+        </Form.Group> */}
         <Form.Group className="mb-3">
           <Form.Select name="game" onChange={handleChange}>
-            <Form.Control required value={currentEvent.game} />
             <option value="">Select a Game</option>
             {
             games?.map((game) => (
@@ -89,7 +89,9 @@ const EventForm = ({ user }) => {
           }
           </Form.Select>
         </Form.Group>
-        <Button variant="primary" type="submit">Submit</Button>
+        <Button variant="primary" type="submit">
+          {obj?.id ? 'Update' : 'Submit'}
+        </Button>
       </Form>
     </>
   );
@@ -97,7 +99,21 @@ const EventForm = ({ user }) => {
 
 EventForm.propTypes = {
   user: PropTypes.shape({
-    id: PropTypes.string.isRequired,
+    uid: PropTypes.string.isRequired,
+  }).isRequired,
+  obj: PropTypes.shape({
+    id: PropTypes.number,
+    description: PropTypes.string,
+    date: PropTypes.string,
+    time: PropTypes.string,
+    game: PropTypes.shape({
+      id: PropTypes.number.isRequired,
+      title: PropTypes.string.isRequired,
+    }),
+    organizer: PropTypes.shape({
+      id: PropTypes.number,
+      uid: PropTypes.string,
+    }),
   }).isRequired,
 };
 

@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import React, { useEffect, useState } from 'react';
 import GameForm from '../../../components/game/GameForm';
 import { useAuth } from '../../../utils/context/authContext';
-import { getSingleGame } from '../../../utils/data/gameData';
+import { getSingleGame, getGames } from '../../../utils/data/gameData';
 
 export default function EditGame() {
   const [editGame, setEditGame] = useState({});
@@ -15,6 +15,6 @@ export default function EditGame() {
   }, [id]);
 
   return (
-    <GameForm user={user} gameObj={editGame} />
+    <GameForm user={user} gameObj={editGame} onUpdate={getGames} />
   );
 }

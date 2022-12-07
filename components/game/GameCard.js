@@ -13,7 +13,6 @@ function GameCard({
   onUpdate,
 }) {
   const deleteSingleGame = () => {
-    console.warn(id);
     if (window.confirm(`Delete ${title}?`)) {
       deleteGame(id).then(() => onUpdate());
     }
@@ -29,7 +28,7 @@ function GameCard({
       <Link href={`/games/edit/${id}`} passHref>
         <Button variant="primary" className="m-2">Edit Game</Button>
       </Link>
-      <Button variant="primary" className="m-2" onClick={deleteSingleGame}>Delete Game</Button>
+      <Button variant="primary" className="m-2" onClick={deleteSingleGame}>DELETE</Button>
     </Card>
   );
 }

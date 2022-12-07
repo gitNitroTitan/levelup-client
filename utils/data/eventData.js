@@ -1,10 +1,10 @@
 import axios from 'axios';
 import { clientCredentials } from '../client';
 
-const getEvents = (user = '') => new Promise((resolve, reject) => {
-  axios
-    .get(`${clientCredentials.databaseURL}/events?uid=${user}`)
-    .then((response) => resolve(Object.values(response.data)))
+const getEvents = () => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/events`)
+    .then((response) => response.json())
+    .then(resolve)
     .catch(reject);
 });
 
@@ -12,12 +12,6 @@ const getSingleEvent = (id) => new Promise((resolve, reject) => {
   fetch(`${clientCredentials.databaseURL}/events/${id}`)
     .then((response) => resolve(response.json()))
     .catch((error) => reject(error));
-});
-
-const getEventById = (id) => new Promise((resolve, reject) => {
-  axios.get(`${clientCredentials.databaseURL}/events/${id}`)
-    .then((response) => resolve(response.data))
-    .catch(reject);
 });
 
 const createEvent = (event) => new Promise((resolve, reject) => {
@@ -32,16 +26,20 @@ const createEvent = (event) => new Promise((resolve, reject) => {
     .catch(reject);
 });
 
-const updateEvent = (event) => new Promise((resolve, reject) => {
-  axios.put(`${clientCredentials.databaseURL}/events/${event.id}`, event)
-    .then(resolve)
-    .catch(reject);
+const updateEvent = (data, id) => new Promise((resolve, reject) => {
+  fetch(`${clientCredentials.databaseURL}/events/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  })
+    .then((response) => resolve(response))
+    .catch((error) => reject(error));
 });
 
 const deleteEvent = (id) => new Promise((resolve, reject) => {
-  axios.delete(`${clientCredentials.databaseURL}/events/${id}`)
-    .then(resolve)
-    .catch(reject);
+  fetch(`${clientCredentials.databaseURL}/events/${id}`, {
+    method: 'DELETE',
+  }).then(resolve).catch(reject);
 });
 
 const leaveEvent = (eventId, user) => new Promise((resolve, reject) => {
@@ -53,5 +51,5 @@ const joinEvent = (eventId, user) => new Promise((resolve, reject) => {
 });
 
 export {
-  getEvents, getEventById, getSingleEvent, createEvent, updateEvent, deleteEvent, leaveEvent, joinEvent,
+  getEvents, getSingleEvent, createEvent, updateEvent, deleteEvent, leaveEvent, joinEvent,
 };
